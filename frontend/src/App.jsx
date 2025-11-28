@@ -1,8 +1,7 @@
-import React from "react";
-import UserRoutes from "./routes/UserRoutes";
+import Role from "./routes/Role";
 
 const App = () => {
-  return <UserRoutes />;
+  return <Role />;
 };
 
 export default App;

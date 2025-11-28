@@ -1,9 +1,155 @@
-
-import React, { useState } from 'react';
-import { ArrowLeft, Moon, Zap, Shield, Users, MapPin, Globe, Plane, Compass, Mail, Lock } from 'lucide-react';
+import React, { useContext, useState } from "react";
+import {
+  ArrowLeft,
+  Moon,
+  Zap,
+  Shield,
+  Users,
+  MapPin,
+  Globe,
+  Plane,
+  Compass,
+  Mail,
+  Lock,
+} from "lucide-react";
+import logo from "../../assets/NaviGo_Logo.png";
+import { AuthContext } from "../../context/AuthContext";
 
 const UserLogin = () => {
   const [isRegister, setIsRegister] = useState(false);
+  const { setUser } = useContext(AuthContext);
+
+  // Form state for login
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+
+  // Form state for register
+  const [registerData, setRegisterData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (!loginData.email || !loginData.password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(loginData.email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+    // Password validation
+    if (loginData.password.length < 6) {
+      alert("Password must be at least 6 characters long");
+      return;
+    }
+
+    // Simulate API call - replace with actual authentication
+    console.log("Login attempt with:", loginData);
+
+    // For demo purposes, set user as authenticated
+    setUser({
+      id: 1,
+      name:
+        `${registerData.firstName} ${registerData.lastName}`.trim() ||
+        "Travel Explorer",
+      email: loginData.email,
+    });
+
+    // Reset form
+    setLoginData({
+      email: "",
+      password: "",
+    });
+
+    alert("Login successful! Welcome back!");
+  };
+
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (
+      !registerData.firstName ||
+      !registerData.lastName ||
+      !registerData.email ||
+      !registerData.password ||
+      !registerData.confirmPassword
+    ) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(registerData.email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+    // Password validation
+    if (registerData.password.length < 6) {
+      alert("Password must be at least 6 characters long");
+      return;
+    }
+
+    // Password confirmation
+    if (registerData.password !== registerData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    // Simulate API call - replace with actual registration
+    console.log("Registration attempt with:", registerData);
+
+    // For demo purposes, set user as authenticated
+    setUser({
+      id: 1,
+      name: `${registerData.firstName} ${registerData.lastName}`,
+      email: registerData.email,
+    });
+
+    // Reset form
+    setRegisterData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+
+    alert("Registration successful! Welcome to NaviGo!");
+  };
+
+  // Update login form data
+  const handleLoginChange = (e) => {
+    const { id, value } = e.target;
+    setLoginData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  // Update register form data
+  const handleRegisterChange = (e) => {
+    const { id, value } = e.target;
+    setRegisterData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center font-sans text-gray-900 dark:text-gray-100">
@@ -11,11 +157,14 @@ const UserLogin = () => {
         <div className="flex flex-col lg:flex-row w-full max-w-6xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
           {/* Left Content */}
           <div className="w-full lg:w-1/2 p-8 lg:p-12 bg-cyan-600 text-white">
-            <button className="text-white mb-8 flex items-center" onClick={() => window.history.back()}>
+            <button
+              className="text-white mb-8 flex items-center"
+              onClick={() => window.history.back()}
+            >
               <ArrowLeft size={16} className="mr-2" /> Back
             </button>
             <div className="mb-8">
-              <img src="/Assets/Images/NaviGo_Logo.png" alt="NaviGo Logo" className="h-12" />
+              <img src={logo} alt="NaviGo Logo" className="h-12" />
             </div>
             <h1 className="text-4xl font-bold mb-3">
               <span className="block">Your Journey</span>
@@ -23,35 +172,45 @@ const UserLogin = () => {
             </h1>
             <h2 className="text-2xl mb-6">Welcome to NaviGo</h2>
             <p className="mb-8 leading-relaxed">
-              Your intelligent travel companion for seamless trip planning, cost optimization, and collaborative group adventures that create lasting memories.
+              Your intelligent travel companion for seamless trip planning, cost
+              optimization, and collaborative group adventures that create
+              lasting memories.
             </p>
             <div className="grid grid-cols-2 gap-6">
               <div className="flex items-start">
                 <Zap size={24} className="text-cyan-300 mr-4 mt-1" />
                 <div>
                   <h4 className="font-semibold">AI-Powered Planning</h4>
-                  <p className="text-sm text-cyan-200">Smart recommendations for you</p>
+                  <p className="text-sm text-cyan-200">
+                    Smart recommendations for you
+                  </p>
                 </div>
               </div>
               <div className="flex items-start">
                 <Shield size={24} className="text-cyan-300 mr-4 mt-1" />
                 <div>
                   <h4 className="font-semibold">Secure & Synced</h4>
-                  <p className="text-sm text-cyan-200">All your adventures in one place</p>
+                  <p className="text-sm text-cyan-200">
+                    All your adventures in one place
+                  </p>
                 </div>
               </div>
               <div className="flex items-start">
                 <Users size={24} className="text-cyan-300 mr-4 mt-1" />
                 <div>
                   <h4 className="font-semibold">Group Adventures</h4>
-                  <p className="text-sm text-cyan-200">Collaborate and explore together</p>
+                  <p className="text-sm text-cyan-200">
+                    Collaborate and explore together
+                  </p>
                 </div>
               </div>
               <div className="flex items-start">
                 <MapPin size={24} className="text-cyan-300 mr-4 mt-1" />
                 <div>
                   <h4 className="font-semibold">Smart Savings</h4>
-                  <p className="text-sm text-cyan-200">Optimize costs on every journey</p>
+                  <p className="text-sm text-cyan-200">
+                    Optimize costs on every journey
+                  </p>
                 </div>
               </div>
             </div>
@@ -60,20 +219,26 @@ const UserLogin = () => {
           {/* Right Login Panel */}
           <div className="w-full lg:w-1/2 p-8 lg:p-12">
             <div className="text-right mb-6">
-              <h3 className="text-sm font-semibold text-gray-500">NAVIGO ACCESS</h3>
+              <h3 className="text-sm font-semibold text-gray-500">
+                NAVIGO ACCESS
+              </h3>
               <h4 className="text-lg font-bold">Your Travel Portal</h4>
             </div>
 
             <div className="mb-6">
               <div className="flex border border-gray-300 dark:border-gray-600 rounded-lg p-1">
                 <button
-                  className={`w-1/2 py-2 rounded-md font-semibold transition ${!isRegister ? 'bg-cyan-600 text-white' : 'text-gray-500'}`}
+                  className={`w-1/2 py-2 rounded-md font-semibold transition ${
+                    !isRegister ? "bg-cyan-600 text-white" : "text-gray-500"
+                  }`}
                   onClick={() => setIsRegister(false)}
                 >
                   Sign In
                 </button>
                 <button
-                  className={`w-1/2 py-2 rounded-md font-semibold transition ${isRegister ? 'bg-cyan-600 text-white' : 'text-gray-500'}`}
+                  className={`w-1/2 py-2 rounded-md font-semibold transition ${
+                    isRegister ? "bg-cyan-600 text-white" : "text-gray-500"
+                  }`}
                   onClick={() => setIsRegister(true)}
                 >
                   New Journey
@@ -82,27 +247,44 @@ const UserLogin = () => {
             </div>
 
             {/* Sign In Form */}
-            <form className={`${isRegister ? 'hidden' : 'block'}`}>
+            <form
+              onSubmit={handleLoginSubmit}
+              className={`${isRegister ? "hidden" : "block"}`}
+            >
               <h5 className="text-xl font-bold mb-1">Access Your Journey</h5>
-              <p className="text-gray-500 mb-6">Sign in to continue your travel story</p>
+              <p className="text-gray-500 mb-6">
+                Sign in to continue your travel story
+              </p>
               <div className="mb-4">
-                <label className="block text-sm font-semibold mb-2 flex items-center" htmlFor="email">
-                  <MapPin size={14} className="mr-2" />Email Address
+                <label
+                  className="block text-sm font-semibold mb-2 flex items-center"
+                  htmlFor="email"
+                >
+                  <MapPin size={14} className="mr-2" />
+                  Email Address
                 </label>
                 <input
                   type="email"
                   id="email"
+                  value={loginData.email}
+                  onChange={handleLoginChange}
                   placeholder="traveler@example.com"
                   className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
               <div className="mb-6">
-                <label className="block text-sm font-semibold mb-2 flex items-center" htmlFor="password">
-                  <Shield size={14} className="mr-2" />Password
+                <label
+                  className="block text-sm font-semibold mb-2 flex items-center"
+                  htmlFor="password"
+                >
+                  <Shield size={14} className="mr-2" />
+                  Password
                 </label>
                 <input
                   type="password"
                   id="password"
+                  value={loginData.password}
+                  onChange={handleLoginChange}
                   placeholder="Your secure password"
                   className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
@@ -116,66 +298,144 @@ const UserLogin = () => {
             </form>
 
             {/* Register Form */}
-            <form className={`${!isRegister ? 'hidden' : 'block'}`}>
-               <h5 className="text-xl font-bold mb-1">Create Your Account</h5>
-               <p className="text-gray-500 mb-6">Start your adventure with NaviGo</p>
-               <div className="grid grid-cols-2 gap-4">
-                 <div>
-                    <label className="block text-sm font-semibold mb-2" htmlFor="firstname">First Name</label>
-                    <input type="text" id="firstname" placeholder="Explorer" className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"/>
+            <form
+              onSubmit={handleRegisterSubmit}
+              className={`${!isRegister ? "hidden" : "block"}`}
+            >
+              <h5 className="text-xl font-bold mb-1">Create Your Account</h5>
+              <p className="text-gray-500 mb-6">
+                Start your adventure with NaviGo
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    className="block text-sm font-semibold mb-2"
+                    htmlFor="firstName"
+                  >
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    value={registerData.firstName}
+                    onChange={handleRegisterChange}
+                    placeholder="Explorer"
+                    className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  />
                 </div>
-                 <div>
-                    <label className="block text-sm font-semibold mb-2" htmlFor="lastname">Last Name</label>
-                    <input type="text" id="lastname" placeholder="Adventurer" className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"/>
-                </div>
-                 <div className="col-span-2">
-                    <label className="block text-sm font-semibold mb-2 flex items-center" htmlFor="reg_email"><Globe size={14} className="mr-2" />Email Address</label>
-                    <input type="email" id="reg_email" placeholder="explorer@wanderlust.com" className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"/>
+                <div>
+                  <label
+                    className="block text-sm font-semibold mb-2"
+                    htmlFor="lastName"
+                  >
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    value={registerData.lastName}
+                    onChange={handleRegisterChange}
+                    placeholder="Adventurer"
+                    className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  />
                 </div>
                 <div className="col-span-2">
-                    <label className="block text-sm font-semibold mb-2 flex items-center" htmlFor="reg_password"><Lock size={14} className="mr-2" />Secure Password</label>
-                    <input type="password" id="reg_password" placeholder="Create your travel key" className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"/>
+                  <label
+                    className="block text-sm font-semibold mb-2 flex items-center"
+                    htmlFor="email"
+                  >
+                    <Globe size={14} className="mr-2" />
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={registerData.email}
+                    onChange={handleRegisterChange}
+                    placeholder="explorer@wanderlust.com"
+                    className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  />
                 </div>
-                 <div className="col-span-2">
-                    <label className="block text-sm font-semibold mb-2 flex items-center" htmlFor="confirm_password"><Lock size={14} className="mr-2" />Confirm Password</label>
-                    <input type="password" id="confirm_password" placeholder="Repeat your travel key" className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"/>
+                <div className="col-span-2">
+                  <label
+                    className="block text-sm font-semibold mb-2 flex items-center"
+                    htmlFor="password"
+                  >
+                    <Lock size={14} className="mr-2" />
+                    Secure Password
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    value={registerData.password}
+                    onChange={handleRegisterChange}
+                    placeholder="Create your travel key"
+                    className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  />
                 </div>
-               </div>
-               <button
+                <div className="col-span-2">
+                  <label
+                    className="block text-sm font-semibold mb-2 flex items-center"
+                    htmlFor="confirmPassword"
+                  >
+                    <Lock size={14} className="mr-2" />
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    value={registerData.confirmPassword}
+                    onChange={handleRegisterChange}
+                    placeholder="Repeat your travel key"
+                    className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+              </div>
+              <button
                 type="submit"
                 className="w-full mt-6 bg-cyan-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-cyan-700 transition flex items-center justify-center"
               >
                 <Compass size={16} className="mr-2" /> Start Adventure
               </button>
             </form>
-            
+
             <div className="mt-6 text-center">
-                <a href="#" className="text-sm text-cyan-600 hover:underline">Lost your travel pass?</a>
+              <a href="#" className="text-sm text-cyan-600 hover:underline">
+                Lost your travel pass?
+              </a>
             </div>
-            
+
             <div className="mt-6">
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">QUICK ACCESS</span>
-                    </div>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                 </div>
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                    <button className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <Mail size={16} className="mr-2" /> Google
-                    </button>
-                    <button className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <Mail size={16} className="mr-2" /> Microsoft
-                    </button>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">
+                    QUICK ACCESS
+                  </span>
                 </div>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <button className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <Mail size={16} className="mr-2" /> Google
+                </button>
+                <button className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <Mail size={16} className="mr-2" /> Microsoft
+                </button>
+              </div>
             </div>
 
             <div className="mt-6 text-xs text-gray-500 text-center">
-                By continuing, you agree to our <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>
+              By continuing, you agree to our{" "}
+              <a href="#" className="underline">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="#" className="underline">
+                Privacy Policy
+              </a>
             </div>
-
           </div>
         </div>
       </div>

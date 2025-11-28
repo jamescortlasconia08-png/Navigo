@@ -7,18 +7,19 @@ import MyTrips from "../components/user/MyTrips";
 import Plan from "../components/user/Plan";
 import Profile from "../components/user/menu/Profile";
 import AccountSettings from "../components/user/menu/AccountSettings";
+import UserLayout from "../layout/UserLayout";
 
 const UserRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<UserLandingPage />} />
-        <Route path="/explore" element={<Explore />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/my-trips" element={<MyTrips />} />
-        <Route path="/plan" element={<Plan />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/account-settings" element={<AccountSettings />} />
+        <Route path="/" element={<UserLayout><UserLandingPage /></UserLayout>} />
+        <Route path="/explore" element={<UserLayout><Explore /></UserLayout>} />
+        <Route path="/history" element={<UserLayout><History /></UserLayout>} />
+        <Route path="/my-trips" element={<UserLayout><MyTrips /></UserLayout>} />
+        <Route path="/plan" element={<UserLayout><Plan /></UserLayout>} />
+        <Route path="/profile" element={<UserLayout><Profile /></UserLayout>} />
+        <Route path="/account-settings" element={<UserLayout><AccountSettings /></UserLayout>} />
       </Routes>
     </BrowserRouter>
   );

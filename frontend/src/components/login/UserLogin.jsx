@@ -156,7 +156,7 @@ const UserLogin = () => {
       <div className="container mx-auto p-4 flex justify-center">
         <div className="flex flex-col lg:flex-row w-full max-w-6xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
           {/* Left Content */}
-          <div className="w-full lg:w-1/2 p-8 lg:p-12 bg-cyan-600 text-white">
+          <div className="w-full lg:w-1/2 p-8 lg:p-12 bg-cyan-600 text-white hidden md:block">
             <button
               className="text-white mb-8 flex items-center"
               onClick={() => window.history.back()}

@@ -14,7 +14,7 @@ const UserRoutes = () => {
     <BrowserRouter>
       <Routes>
         <Route
-          path="/"
+          path="/dashboard"
           element={
             <UserLayout>
               <UserDashboard />
@@ -69,7 +69,7 @@ const UserRoutes = () => {
             </UserLayout>
           }
         />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </BrowserRouter>
   );

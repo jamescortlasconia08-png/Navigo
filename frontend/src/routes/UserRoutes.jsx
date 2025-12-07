@@ -8,6 +8,7 @@ import Profile from "../components/user/menu/Profile";
 import AccountSettings from "../components/user/menu/AccountSettings";
 import UserLayout from "../layout/UserLayout";
 import UserDashboard from "../components/user/UserDashboard";
+import MyTripDetails from "../components/user/MyTripsDetails";
 
 const UserRoutes = () => {
   return (
@@ -42,6 +43,14 @@ const UserRoutes = () => {
           element={
             <UserLayout>
               <MyTrips />
+            </UserLayout>
+          }
+        />
+        <Route
+          path="/my-trips/:id"
+          element={
+            <UserLayout>
+              <MyTripDetails />
             </UserLayout>
           }
         />

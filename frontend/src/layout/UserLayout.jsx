@@ -67,7 +67,7 @@ const UserLayout = ({ children }) => {
             <motion.div variants={childVariants}>
               <Header />
             </motion.div>
-            <motion.div variants={childVariants}>{children}</motion.div>
+            <div>{children}</div>
           </motion.div>
         )}
       </AnimatePresence>

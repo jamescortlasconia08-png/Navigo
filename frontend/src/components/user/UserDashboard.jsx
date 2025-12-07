@@ -15,7 +15,43 @@ import {
   Twitter,
   Instagram,
   Linkedin,
+  X,
+  Calendar,
+  Users as UsersIcon,
+  CheckCircle,
+  Clock,
 } from "lucide-react";
+
+// Dropdown options
+const destinationOptions = [
+  "Select a destination",
+  "Tokyo, Japan",
+  "Paris, France",
+  "Bali, Indonesia",
+  "New York, USA",
+  "Sydney, Australia",
+  "Rome, Italy",
+  "Bangkok, Thailand",
+  "Dubai, UAE",
+];
+
+const durationOptions = [
+  "Select duration",
+  "3-5 days",
+  "6-8 days",
+  "9-12 days",
+  "2+ weeks",
+];
+
+const travelStyleOptions = [
+  "Select travel style",
+  "Luxury & Comfort",
+  "Budget & Adventure",
+  "Family Friendly",
+  "Solo Travel",
+  "Romantic Getaway",
+  "Cultural Experience",
+];
 
 // Mock Data
 const recentAdventures = [
@@ -97,9 +133,265 @@ const statsCards = [
   },
 ];
 
+// Travel Plans Modal Component
+const TravelPlansModal = ({ isOpen, onClose, userSelection }) => {
+  if (!isOpen) return null;
+
+  const { destination, duration, travelStyle } = userSelection;
+
+  // Mock travel plans based on user input
+  const generatePlans = (input) => {
+    if (
+      input.destination === "Select a destination" ||
+      input.duration === "Select duration" ||
+      input.travelStyle === "Select travel style"
+    ) {
+      return [];
+    }
+
+    return [
+      {
+        id: 1,
+        title: `Premium ${input.destination} Experience`,
+        description: `Based on your selection of ${input.travelStyle.toLowerCase()} for ${input.duration.toLowerCase()}, we've crafted an exclusive itinerary.`,
+        duration: "7 days",
+        price: "$1,899",
+        highlights: [
+          "Private Guided Tours",
+          "Luxury Accommodation",
+          "All Meals Included",
+          "VIP Access",
+        ],
+        rating: 4.8,
+        bestFor: "Couples & Luxury Travelers",
+        inclusions: ["Flights", "Hotels", "Transfers", "Activities"],
+      },
+      {
+        id: 2,
+        title: `Budget-Friendly ${input.destination} Adventure`,
+        description:
+          "Perfect for travelers looking for an authentic experience without breaking the bank.",
+        duration: "5 days",
+        price: "$899",
+        highlights: [
+          "Local Homestay",
+          "Group Activities",
+          "Public Transport",
+          "Street Food Tours",
+        ],
+        rating: 4.5,
+        bestFor: "Backpackers & Students",
+        inclusions: [
+          "Budget Hotels",
+          "Some Meals",
+          "Local Guides",
+          "Entry Fees",
+        ],
+      },
+      {
+        id: 3,
+        title: `Family ${input.destination} Getaway`,
+        description:
+          "Kid-friendly activities and comfortable accommodations for the whole family.",
+        duration: "8 days",
+        price: "$2,499",
+        highlights: [
+          "Family Suites",
+          "Childcare Services",
+          "Educational Tours",
+          "Theme Park Visits",
+        ],
+        rating: 4.9,
+        bestFor: "Families with Children",
+        inclusions: [
+          "Family Accommodation",
+          "All Meals",
+          "Child Activities",
+          "Insurance",
+        ],
+      },
+    ];
+  };
+
+  const plans = generatePlans(userSelection);
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        {/* Modal Header */}
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Star className="text-yellow-500" size={24} />
+              Your Personalized Travel Plans
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              Based on your selection: {destination} for {duration} (
+              {travelStyle})
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="p-6 overflow-y-auto max-h-[70vh]">
+          {plans.length === 0 ? (
+            <div className="text-center py-12">
+              <MapPin size={48} className="mx-auto text-gray-400 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">
+                No Plans Generated Yet
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Please select all options to see personalized plans.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {plans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className="border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">{plan.title}</h3>
+                      <p className="text-gray-600 dark:text-gray-400 mb-3">
+                        {plan.description}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-cyan-600">
+                        {plan.price}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {plan.duration}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        <CheckCircle size={16} className="text-green-500" />
+                        Highlights
+                      </h4>
+                      <ul className="space-y-1">
+                        {plan.highlights.map((highlight, idx) => (
+                          <li
+                            key={idx}
+                            className="flex items-center gap-2 text-sm"
+                          >
+                            <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full"></div>
+                            {highlight}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        <CheckCircle size={16} className="text-green-500" />
+                        What's Included
+                      </h4>
+                      <ul className="space-y-1">
+                        {plan.inclusions.map((inclusion, idx) => (
+                          <li
+                            key={idx}
+                            className="flex items-center gap-2 text-sm"
+                          >
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                            {inclusion}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-1">
+                        <Star
+                          size={16}
+                          className="text-yellow-500 fill-current"
+                        />
+                        <span className="font-semibold">{plan.rating}/5</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <UsersIcon size={16} />
+                        <span>Best for: {plan.bestFor}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        Save for Later
+                      </button>
+                      <button className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition flex items-center gap-2">
+                        <Calendar size={16} />
+                        Book Now
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Modal Footer */}
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              <Clock size={16} className="inline mr-1" />
+              Plans are generated in real-time based on your preferences
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+              >
+                Close
+              </button>
+              <button className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition flex items-center gap-2">
+                <Share2 size={16} />
+                Share Plans
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Main Component
 const UserDashboard = () => {
   const [view, setView] = useState("landing");
+  const [showPlansModal, setShowPlansModal] = useState(false);
+
+  // Simple form state with dropdowns
+  const [destination, setDestination] = useState("Select a destination");
+  const [duration, setDuration] = useState("Select duration");
+  const [travelStyle, setTravelStyle] = useState("Select travel style");
+
+  // Simple form handler
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Check if all fields are selected
+    if (
+      destination !== "Select a destination" &&
+      duration !== "Select duration" &&
+      travelStyle !== "Select travel style"
+    ) {
+      setShowPlansModal(true);
+    } else {
+      alert("Please select all options to see travel plans!");
+    }
+  };
 
   const LandingPageContent = () => (
     <div>
@@ -116,7 +408,20 @@ const UserDashboard = () => {
           into unforgettable journeys.
         </p>
         <div className="flex justify-center gap-4 mb-10 flex-wrap">
-          <button className="bg-cyan-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-cyan-700 transition flex items-center gap-2">
+          <button
+            onClick={() => {
+              if (
+                destination !== "Select a destination" &&
+                duration !== "Select duration" &&
+                travelStyle !== "Select travel style"
+              ) {
+                setShowPlansModal(true);
+              } else {
+                alert("Please select all options first!");
+              }
+            }}
+            className="bg-cyan-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-cyan-700 transition flex items-center gap-2"
+          >
             <Plane size={18} />
             Start Your Journey <ArrowRight size={18} />
           </button>
@@ -148,27 +453,67 @@ const UserDashboard = () => {
             Plan Your Dream Journey
           </h2>
           <p className="text-gray-500 dark:text-gray-400 mb-6">
-            Share your travel dreams, and we'll craft the perfect adventure
+            Select your preferences, and we'll craft the perfect adventure
             tailored for you!
           </p>
-          <form className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Destination"
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Destination Dropdown */}
+            <div>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                <MapPin size={18} className="inline mr-2" />
+                Destination
+              </label>
+              <select
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
                 className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
-              />
-              <input
-                type="text"
-                placeholder="Travel Dates"
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
-              />
+              >
+                {destinationOptions.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </div>
-            <textarea
-              placeholder="Tell us about your dream adventure..."
-              rows={4}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
-            ></textarea>
+
+            {/* Duration Dropdown */}
+            <div>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                <Briefcase size={18} className="inline mr-2" />
+                Trip Duration
+              </label>
+              <select
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+              >
+                {durationOptions.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Travel Style Dropdown */}
+            <div>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                <Users size={18} className="inline mr-2" />
+                Travel Style
+              </label>
+              <select
+                value={travelStyle}
+                onChange={(e) => setTravelStyle(e.target.value)}
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+              >
+                {travelStyleOptions.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <button
               type="submit"
               className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2"
@@ -383,6 +728,12 @@ const UserDashboard = () => {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
+      <TravelPlansModal
+        isOpen={showPlansModal}
+        onClose={() => setShowPlansModal(false)}
+        userSelection={{ destination, duration, travelStyle }}
+      />
+
       <div className="flex justify-center py-6">
         <div className="bg-gray-200 dark:bg-gray-700 p-1 rounded-lg flex">
           <button

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Briefcase,
   Compass,
@@ -20,6 +20,16 @@ import { AuthContext } from "../../context/AuthContext";
 const Header = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const { logout } = useContext(AuthContext);
+  const location = useLocation();
+
+  // Helper function to check if current path matches
+  const isActive = (path) => {
+    // Exact match or starts with path (for nested routes)
+    return (
+      location.pathname === path || location.pathname.startsWith(`${path}/`)
+    );
+  };
+
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 flex items-center justify-between px-6 py-3">
       <div className="flex items-center space-x-6">
@@ -30,28 +40,44 @@ const Header = () => {
         <nav className="hidden md:flex items-center space-x-4">
           <Link
             to="/my-trips"
-            className="flex items-center space-x-2 text-gray-500 hover:text-cyan-600"
+            className={`flex items-center space-x-2 transition-colors ${
+              isActive("/my-trips")
+                ? "text-cyan-600 font-semibold"
+                : "text-gray-500 hover:text-cyan-600"
+            }`}
           >
             <Briefcase size={20} />
             <span>My Trips</span>
           </Link>
           <Link
             to="/explore"
-            className="flex items-center space-x-2 text-gray-500 hover:text-cyan-600"
+            className={`flex items-center space-x-2 transition-colors ${
+              isActive("/explore")
+                ? "text-cyan-600 font-semibold"
+                : "text-gray-500 hover:text-cyan-600"
+            }`}
           >
             <Compass size={20} />
             <span>Explore</span>
           </Link>
           <Link
             to="/history"
-            className="flex items-center space-x-2 text-gray-500 hover:text-cyan-600"
+            className={`flex items-center space-x-2 transition-colors ${
+              isActive("/history")
+                ? "text-cyan-600 font-semibold"
+                : "text-gray-500 hover:text-cyan-600"
+            }`}
           >
             <Clock size={20} />
             <span>History</span>
           </Link>
           <Link
             to="/plan"
-            className="flex items-center space-x-2 text-gray-500 hover:text-cyan-600"
+            className={`flex items-center space-x-2 transition-colors ${
+              isActive("/plan")
+                ? "text-cyan-600 font-semibold"
+                : "text-gray-500 hover:text-cyan-600"
+            }`}
           >
             <MapPin size={20} />
             <span>Plan</span>
@@ -90,29 +116,59 @@ const Header = () => {
             <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-2 z-50">
               <Link
                 to="/profile"
-                className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className={`flex items-center px-4 py-2 text-sm transition-colors ${
+                  isActive("/profile")
+                    ? "text-cyan-600 font-semibold bg-cyan-50 dark:bg-cyan-900/20"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+                onClick={() => setProfileOpen(false)}
               >
                 <User size={16} className="mr-3" />
                 View Profile
               </Link>
               <Link
                 to="/plan"
-                className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className={`flex items-center px-4 py-2 text-sm transition-colors ${
+                  isActive("/plan")
+                    ? "text-cyan-600 font-semibold bg-cyan-50 dark:bg-cyan-900/20"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+                onClick={() => setProfileOpen(false)}
               >
                 <Crown size={16} className="mr-3" />
-                Plans & Billing
+                Trips & Plans
+              </Link>
+              <Link
+                to="/subscription"
+                className={`flex items-center px-4 py-2 text-sm transition-colors ${
+                  isActive("/plan")
+                    ? "text-cyan-600 font-semibold bg-cyan-50 dark:bg-cyan-900/20"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+                onClick={() => setProfileOpen(false)}
+              >
+                <Crown size={16} className="mr-3" />
+                Subscription & Billing
               </Link>
               <Link
                 to="/account-settings"
-                className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className={`flex items-center px-4 py-2 text-sm transition-colors ${
+                  isActive("/account-settings")
+                    ? "text-cyan-600 font-semibold bg-cyan-50 dark:bg-cyan-900/20"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+                onClick={() => setProfileOpen(false)}
               >
                 <Settings size={16} className="mr-3" />
                 Account Settings
               </Link>
               <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
               <button
-                onClick={() => logout()}
-                className="flex items-center px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                onClick={() => {
+                  logout();
+                  setProfileOpen(false);
+                }}
+                className="flex items-center px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left"
               >
                 <LogOut size={16} className="mr-3" />
                 End Journey

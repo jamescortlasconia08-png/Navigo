@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   phone: String,
   date_of_birth: String,
   bio: String,
+  role: { type: String, default: "traveler" },
 
   location: String,
   timezone: String,

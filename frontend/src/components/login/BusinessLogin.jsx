@@ -1,7 +1,169 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import logo from "../../assets/NaviGo_Logo.png";
+import {
+  loginBusiness,
+  registerBusiness,
+} from "../../services/businessService";
+import { AuthContext } from "../../context/AuthContext";
+
 const BusinessLogin = () => {
   const [isRegister, setIsRegister] = useState(false);
+  const { setUser } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Login form state
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+
+  // Register form state
+  const [registerData, setRegisterData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    business_name: "",
+    business_type: "",
+    phone: "",
+  });
+
+  // Handle login submit
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!loginData.email || !loginData.password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      // Call business login service
+      const response = await loginBusiness(loginData);
+
+      // Set user in context
+      setUser({
+        ...response.business,
+        role: "business",
+      });
+
+      // Clear form
+      setLoginData({
+        email: "",
+        password: "",
+      });
+
+      // Show success message
+      alert("Business login successful! Welcome to NaviGo Partner Portal.");
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.error || "Login failed. Please try again.";
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle register submit
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    // Basic validation
+    if (
+      !registerData.name ||
+      !registerData.email ||
+      !registerData.password ||
+      !registerData.business_name ||
+      !registerData.business_type
+    ) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(registerData.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    // Password validation
+    if (registerData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      // Prepare registration data
+      const registrationData = {
+        name: registerData.name,
+        email: registerData.email,
+        password: registerData.password,
+        business_name: registerData.business_name,
+        business_type: registerData.business_type,
+        phone: registerData.phone || "",
+      };
+
+      // Call register business service
+      const response = await registerBusiness(registrationData);
+
+      // Set user in context
+      setUser({
+        ...response.business,
+        role: "business",
+      });
+
+      // Clear form
+      setRegisterData({
+        name: "",
+        email: "",
+        password: "",
+        business_name: "",
+        business_type: "",
+        phone: "",
+      });
+
+      // Show success message
+      alert(
+        "Business registration successful! Welcome to NaviGo Partner Network."
+      );
+
+      // Switch to login tab
+      setIsRegister(false);
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.error || "Registration failed. Please try again.";
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle login form change
+  const handleLoginChange = (e) => {
+    const { id, value } = e.target;
+    setLoginData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+    setError("");
+  };
+
+  // Handle register form change
+  const handleRegisterChange = (e) => {
+    const { id, value } = e.target;
+    setRegisterData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+    setError("");
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center font-sans text-gray-900 dark:text-gray-100">
@@ -83,6 +245,7 @@ const BusinessLogin = () => {
                     !isRegister ? "bg-purple-600 text-white" : "text-gray-500"
                   }`}
                   onClick={() => setIsRegister(false)}
+                  disabled={isLoading}
                 >
                   Sign In
                 </button>
@@ -91,14 +254,25 @@ const BusinessLogin = () => {
                     isRegister ? "bg-purple-600 text-white" : "text-gray-500"
                   }`}
                   onClick={() => setIsRegister(true)}
+                  disabled={isLoading}
                 >
                   Register
                 </button>
               </div>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Sign In Form */}
-            <form className={`${isRegister ? "hidden" : "block"}`}>
+            <form
+              onSubmit={handleLoginSubmit}
+              className={`${isRegister ? "hidden" : "block"}`}
+            >
               <h5 className="text-xl font-bold mb-1">Partner Access</h5>
               <p className="text-gray-500 mb-6">
                 Sign in to your business portal
@@ -113,8 +287,11 @@ const BusinessLogin = () => {
                 <input
                   type="email"
                   id="email"
+                  value={loginData.email}
+                  onChange={handleLoginChange}
                   placeholder="your-business@company.com"
                   className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  disabled={isLoading}
                 />
               </div>
               <div className="mb-6">
@@ -127,20 +304,33 @@ const BusinessLogin = () => {
                 <input
                   type="password"
                   id="password"
+                  value={loginData.password}
+                  onChange={handleLoginChange}
                   placeholder="Enter your password"
                   className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  disabled={isLoading}
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition flex items-center justify-center"
+                disabled={isLoading}
+                className="w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <i className="fas fa-handshake mr-2"></i> Begin Partnership
+                {isLoading ? (
+                  "Signing in..."
+                ) : (
+                  <>
+                    <i className="fas fa-handshake mr-2"></i> Begin Partnership
+                  </>
+                )}
               </button>
             </form>
 
             {/* Register Form */}
-            <form className={`${!isRegister ? "hidden" : "block"}`}>
+            <form
+              onSubmit={handleRegisterSubmit}
+              className={`${!isRegister ? "hidden" : "block"}`}
+            >
               <h5 className="text-xl font-bold mb-1">Partner Registration</h5>
               <p className="text-gray-500 mb-6">
                 Connect with millions of travelers
@@ -156,8 +346,11 @@ const BusinessLogin = () => {
                   <input
                     type="text"
                     id="business_name"
+                    value={registerData.business_name}
+                    onChange={handleRegisterChange}
                     placeholder="Your Business Name"
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="col-span-2">
@@ -169,77 +362,102 @@ const BusinessLogin = () => {
                   </label>
                   <select
                     id="business_type"
+                    value={registerData.business_type}
+                    onChange={handleRegisterChange}
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    disabled={isLoading}
                   >
                     <option value="">Select business type</option>
                     <option value="Airlines">Airlines</option>
                     <option value="Hotels">Hotels</option>
-                    <option value="transport">Transportation</option>
-                    <option value="other">Other</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Tour Operator">Tour Operator</option>
+                    <option value="Restaurant">Restaurant</option>
+                    <option value="Activity Provider">Activity Provider</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div>
                   <label
                     className="block text-sm font-semibold mb-2"
-                    htmlFor="first_name"
+                    htmlFor="name"
                   >
-                    Contact First Name
+                    Contact Name
                   </label>
                   <input
                     type="text"
-                    id="first_name"
-                    placeholder="John"
+                    id="name"
+                    value={registerData.name}
+                    onChange={handleRegisterChange}
+                    placeholder="John Doe"
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    disabled={isLoading}
                   />
                 </div>
                 <div>
                   <label
                     className="block text-sm font-semibold mb-2"
-                    htmlFor="last_name"
+                    htmlFor="phone"
                   >
-                    Contact Last Name
+                    Phone
                   </label>
                   <input
                     type="text"
-                    id="last_name"
-                    placeholder="Doe"
+                    id="phone"
+                    value={registerData.phone}
+                    onChange={handleRegisterChange}
+                    placeholder="+1 (555) 123-4567"
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="col-span-2">
                   <label
                     className="block text-sm font-semibold mb-2"
-                    htmlFor="reg_email"
+                    htmlFor="email"
                   >
                     <i className="fas fa-envelope mr-2"></i>Business Email
                   </label>
                   <input
                     type="email"
-                    id="reg_email"
+                    id="email"
+                    value={registerData.email}
+                    onChange={handleRegisterChange}
                     placeholder="contact@yourbusiness.com"
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="col-span-2">
                   <label
                     className="block text-sm font-semibold mb-2"
-                    htmlFor="reg_password"
+                    htmlFor="password"
                   >
                     <i className="fas fa-lock mr-2"></i>Password
                   </label>
                   <input
                     type="password"
-                    id="reg_password"
+                    id="password"
+                    value={registerData.password}
+                    onChange={handleRegisterChange}
                     placeholder="Create a strong password"
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
               <button
                 type="submit"
-                className="w-full mt-6 bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition flex items-center justify-center"
+                disabled={isLoading}
+                className="w-full mt-6 bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <i className="fas fa-rocket mr-2"></i> Launch Partnership
+                {isLoading ? (
+                  "Registering..."
+                ) : (
+                  <>
+                    <i className="fas fa-rocket mr-2"></i> Launch Partnership
+                  </>
+                )}
               </button>
             </form>
 

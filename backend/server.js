@@ -7,6 +7,7 @@ import { configDB } from "./config/db.js";
 import userAuthRouter from "./routes/authentication/userAuthRoutes.js";
 import tripRouter from "./routes/tripRoutes.js";
 import exploreRouter from "./routes/exploreRoutes.js";
+import businessRouter from "./routes/businessRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -28,6 +29,7 @@ app.use(express.json()); // Parse JSON request bodies
 app.use("/api/user", userRouter);
 app.use("/api/trip", tripRouter);
 app.use("/api/explore", exploreRouter);
+app.use("/api/business", businessRouter);
 
 //Authnetication
 app.use("/api/user/auth", userAuthRouter);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Briefcase,
   Compass,
@@ -23,53 +23,92 @@ import {
   TrendingUp,
   Share2,
 } from "lucide-react";
-
-// Mock data for destinations
-const trendingDestinations = [
-  {
-    name: "Santorini, Greece",
-    country: "Greece",
-    image:
-      "https://images.unsplash.com/photo-1570077188660-9787c0a69d96?auto=format&fit=crop&w=1000&q=80",
-    priceIndicator: "$$$",
-    rating: 4.8,
-    reviews: 2420,
-    duration: "5-7 days",
-    highlights: ["Sunset Views", "White Architecture"],
-    bestTime: "Apr - Oct",
-    budget: "$150-$300",
-  },
-  {
-    name: "Kyoto, Japan",
-    country: "Japan",
-    image:
-      "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1000&q=80",
-    priceIndicator: "$$",
-    rating: 4.9,
-    reviews: 3150,
-    duration: "4-6 days",
-    highlights: ["Ancient Temples", "Cherry Blossoms"],
-    bestTime: "Oct - Dec, Mar - May",
-    budget: "$100-$200",
-  },
-  {
-    name: "Dubai, UAE",
-    country: "UAE",
-    image:
-      "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1000&q=80",
-    priceIndicator: "$$$$",
-    rating: 4.6,
-    reviews: 1820,
-    duration: "4-5 days",
-    highlights: ["Modern Architecture", "Luxury Shopping"],
-    bestTime: "Nov - Mar",
-    budget: "$250-$500",
-  },
-];
+import {
+  getAllDestinations,
+  searchDestinations,
+} from "../../services/exploreService";
+import { createTrip } from "../../services/tripService";
+import Swal from "sweetalert2";
+import { AuthContext } from "../../context/AuthContext";
 
 // Destination Card Component
-const DestinationCard = ({ destination }) => {
+const DestinationCard = ({ destination, onCreateTrip }) => {
   const [isLiked, setIsLiked] = useState(false);
+  const { user } = useContext(AuthContext);
+
+  const handlePlanTrip = async () => {
+    // Check if user is logged in
+    if (!user?.id) {
+      Swal.fire({
+        title: "Login Required",
+        text: "Please log in to create a trip.",
+        icon: "warning",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#06b6d4",
+      });
+      return;
+    }
+
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: "Plan This Trip?",
+      text: `Do you want to create a trip to ${destination.name}, ${destination.country}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Plan Trip",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#06b6d4",
+      cancelButtonColor: "#6b7280",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        // Create trip data from destination
+        const tripData = {
+          user_id: user.id,
+          destination: destination.name,
+          country: destination.country,
+          dates: "Select dates",
+          duration: destination.duration,
+          travelers: 1,
+          budget: parseInt(destination.budget?.replace(/[^0-9]/g, "")) || 1000,
+          spent: 0,
+          progress: 0,
+          status: "Planning",
+          rating: destination.rating,
+          reviews: destination.reviews,
+          image: destination.image,
+          highlights: destination.highlights || [],
+        };
+
+        // Create trip
+        const newTrip = await createTrip(tripData);
+
+        // Show success message
+        await Swal.fire({
+          title: "Trip Created!",
+          text: `Your trip to ${destination.name} has been added to "My Trips".`,
+          icon: "success",
+          confirmButtonText: "View My Trips",
+          confirmButtonColor: "#06b6d4",
+        });
+
+        // Call callback if provided
+        if (onCreateTrip) {
+          onCreateTrip(newTrip);
+        }
+      } catch (error) {
+        console.error("Error creating trip:", error);
+        Swal.fire({
+          title: "Error",
+          text: "Failed to create trip. Please try again.",
+          icon: "error",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#06b6d4",
+        });
+      }
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
@@ -80,7 +119,7 @@ const DestinationCard = ({ destination }) => {
           className="w-full h-48 object-cover"
         />
         <div className="absolute top-3 left-3 bg-white text-gray-800 text-sm font-bold px-3 py-1 rounded-full">
-          {destination.priceIndicator}
+          {destination.price_indicator}
         </div>
         <div className="absolute top-3 right-3 flex space-x-2">
           <button
@@ -123,7 +162,7 @@ const DestinationCard = ({ destination }) => {
           </div>
         </div>
         <div className="flex flex-wrap gap-2 mb-4">
-          {destination.highlights.map((tag) => (
+          {(destination.highlights || []).slice(0, 2).map((tag) => (
             <span
               key={tag}
               className="bg-gray-100 dark:bg-gray-700 text-xs font-medium px-2 py-1 rounded-full"
@@ -131,15 +170,17 @@ const DestinationCard = ({ destination }) => {
               {tag}
             </span>
           ))}
-          <span className="bg-gray-100 dark:bg-gray-700 text-xs font-medium px-2 py-1 rounded-full">
-            +1 more
-          </span>
+          {destination.highlights && destination.highlights.length > 2 && (
+            <span className="bg-gray-100 dark:bg-gray-700 text-xs font-medium px-2 py-1 rounded-full">
+              +{destination.highlights.length - 2} more
+            </span>
+          )}
         </div>
         <div className="flex justify-between text-xs text-center text-gray-600 dark:text-gray-300 mb-4">
           <div className="flex-1">
             <p className="font-semibold">Best Time</p>
             <p className="text-gray-500 dark:text-gray-400">
-              {destination.bestTime}
+              {destination.best_time}
             </p>
           </div>
           <div className="flex-1 border-l border-gray-200 dark:border-gray-700">
@@ -150,7 +191,10 @@ const DestinationCard = ({ destination }) => {
           </div>
         </div>
         <div className="flex gap-3">
-          <button className="w-full bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-cyan-700 transition">
+          <button
+            onClick={handlePlanTrip}
+            className="w-full bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-cyan-700 transition"
+          >
             Plan Trip
           </button>
           <button className="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
@@ -166,6 +210,11 @@ const DestinationCard = ({ destination }) => {
 const Explore = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [destinations, setDestinations] = useState([]);
+  const [filteredDestinations, setFilteredDestinations] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useContext(AuthContext);
 
   const categories = [
     { id: "all", name: "All", icon: Compass },
@@ -176,6 +225,65 @@ const Explore = () => {
     { id: "luxury", name: "Luxury", icon: Star },
     { id: "nature", name: "Nature", icon: Leaf },
   ];
+
+  // Fetch destinations from API
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getAllDestinations();
+        setDestinations(data);
+        setFilteredDestinations(data);
+      } catch (error) {
+        console.error("Error fetching destinations:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDestinations();
+  }, []);
+
+  // Filter destinations by category
+  useEffect(() => {
+    const filterByCategory = () => {
+      if (activeCategory === "all") {
+        setFilteredDestinations(destinations);
+      } else {
+        const filtered = destinations.filter((dest) =>
+          dest.highlights?.some((highlight) =>
+            highlight.toLowerCase().includes(activeCategory)
+          )
+        );
+        setFilteredDestinations(filtered);
+      }
+    };
+
+    filterByCategory();
+  }, [activeCategory, destinations]);
+
+  // Handle search
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+
+    if (!query.trim()) {
+      setFilteredDestinations(destinations);
+      return;
+    }
+
+    try {
+      const results = await searchDestinations(query);
+      setFilteredDestinations(results);
+    } catch (error) {
+      console.error("Search error:", error);
+    }
+  };
+
+  // Handle trip creation callback
+  const handleTripCreated = (newTrip) => {
+    // You could show a notification or update state here
+    console.log("New trip created:", newTrip);
+  };
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
@@ -202,6 +310,8 @@ const Explore = () => {
                   type="text"
                   placeholder="Search destinations, countries, or activities..."
                   className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
               <div className="flex gap-4">
@@ -247,18 +357,92 @@ const Explore = () => {
             </button>
           </div>
 
-          {/* Trending Now Section */}
-          <div className="mb-10">
-            <h2 className="text-2xl font-bold flex items-center mb-6">
-              <TrendingUp size={24} className="text-cyan-500 mr-3" />
-              Trending Now
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {trendingDestinations.map((dest) => (
-                <DestinationCard key={dest.name} destination={dest} />
-              ))}
+          {/* Loading State */}
+          {isLoading ? (
+            <div className="text-center py-20">
+              <h3 className="text-2xl font-semibold">
+                Loading destinations...
+              </h3>
+              <p className="text-gray-500">
+                Discovering amazing places for you.
+              </p>
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Destinations Section */}
+              <div className="mb-10">
+                <h2 className="text-2xl font-bold flex items-center mb-6">
+                  <TrendingUp size={24} className="text-cyan-500 mr-3" />
+                  Discover Destinations
+                </h2>
+
+                {filteredDestinations.length === 0 ? (
+                  <div className="text-center py-20">
+                    <h3 className="text-2xl font-semibold">
+                      No destinations found
+                    </h3>
+                    <p className="text-gray-500">
+                      Try a different search or filter.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredDestinations.map((dest) => (
+                      <DestinationCard
+                        key={dest._id}
+                        destination={dest}
+                        onCreateTrip={handleTripCreated}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Stats */}
+              {destinations.length > 0 && (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 mb-8">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div>
+                      <div className="text-3xl font-bold">
+                        {destinations.length}
+                      </div>
+                      <div className="text-gray-500">Destinations</div>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold">
+                        {
+                          [...new Set(destinations.map((d) => d.country))]
+                            .length
+                        }
+                      </div>
+                      <div className="text-gray-500">Countries</div>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold">
+                        {Math.round(
+                          (destinations.reduce(
+                            (sum, d) => sum + (d.rating || 0),
+                            0
+                          ) /
+                            destinations.length) *
+                            10
+                        ) / 10 || 0}
+                      </div>
+                      <div className="text-gray-500">Avg Rating</div>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold">
+                        {destinations
+                          .reduce((sum, d) => sum + (d.reviews || 0), 0)
+                          .toLocaleString()}
+                      </div>
+                      <div className="text-gray-500">Total Reviews</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </main>
     </div>

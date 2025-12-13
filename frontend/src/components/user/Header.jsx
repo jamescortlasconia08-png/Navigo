@@ -80,7 +80,7 @@ const Header = () => {
     },
   ]);
 
-  const { logout } = useContext(AuthContext);
+  const { logout, user } = useContext(AuthContext);
   const location = useLocation();
 
   const profileRef = useRef(null);
@@ -344,7 +344,7 @@ const Header = () => {
               className="h-9 w-9 rounded-full border-2 border-cyan-500"
             />
             <span className="hidden text-cyan-100 sm:block font-semibold">
-              User Name
+              {user.first_name}
             </span>
             <ChevronDown
               size={16}

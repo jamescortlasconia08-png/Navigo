@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Briefcase,
   Compass,
@@ -25,84 +25,32 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import CreateTripModal from "./CreateTripModal";
-
-const tripsData = [
-  {
-    id: 1,
-    destination: "Tokyo, Japan",
-    country: "Japan",
-    dates: "Oct 15-22, 2025",
-    duration: "8 days",
-    travelers: 2,
-    budget: "$2,800",
-    spent: "$1,200",
-    progress: 85,
-    status: "Confirmed",
-    rating: "4.8",
-    reviews: "1240",
-    image:
-      "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=60",
-    highlights: ["Cherry Blossom", "Temples", "Cuisine"],
-  },
-  {
-    id: 2,
-    destination: "Paris, France",
-    country: "France",
-    dates: "Nov 10-17, 2025",
-    duration: "7 days",
-    travelers: 1,
-    budget: "$3,200",
-    spent: "$450",
-    progress: 35,
-    status: "Planning",
-    rating: "4.9",
-    reviews: "2150",
-    image:
-      "https://images.unsplash.com/photo-1502602898657-3e91760c0341?auto=format&fit=crop&w=800&q=60",
-    highlights: ["Art Museums", "Fine Dining", "Architecture"],
-  },
-  {
-    id: 3,
-    destination: "New York, USA",
-    country: "USA",
-    dates: "Dec 5-8, 2025",
-    duration: "4 days",
-    travelers: 1,
-    budget: "$1,800",
-    spent: "$1,800",
-    progress: 100,
-    status: "Business",
-    rating: "4.7",
-    reviews: "890",
-    image:
-      "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=60",
-    highlights: ["Conference", "Networking", "Central Park"],
-  },
-];
+import { getUserTrips } from "../../services/tripService";
+import { AuthContext } from "../../context/AuthContext";
 
 const summaryData = [
   {
     icon: Plane,
     title: "Total Trips",
-    value: "3",
+    value: "0",
     color: "bg-blue-100 text-blue-600",
   },
   {
     icon: DollarSign,
     title: "Total Budget",
-    value: "$7,800",
+    value: "$0",
     color: "bg-green-100 text-green-600",
   },
   {
     icon: MapPin,
     title: "Countries",
-    value: "3",
+    value: "0",
     color: "bg-purple-100 text-purple-600",
   },
   {
     icon: BarChart,
     title: "Avg Progress",
-    value: "73%",
+    value: "0%",
     color: "bg-orange-100 text-orange-600",
   },
 ];
@@ -123,7 +71,7 @@ const TripCard = ({ trip }) => (
       />
       <div
         className={`absolute top-3 left-3 text-xs font-bold px-2 py-1 rounded-full ${
-          statusColors[trip.status]
+          statusColors[trip.status] || "bg-gray-100 text-gray-800"
         }`}
       >
         {trip.status}
@@ -144,9 +92,9 @@ const TripCard = ({ trip }) => (
             className="text-yellow-400 mr-1"
             fill="currentColor"
           />
-          {trip.rating}{" "}
+          {trip.rating || "4.0"}{" "}
           <span className="text-gray-500 font-normal ml-1">
-            ({trip.reviews})
+            ({trip.reviews || "0"})
           </span>
         </div>
         <div className="text-gray-500 font-medium">{trip.duration}</div>
@@ -160,7 +108,7 @@ const TripCard = ({ trip }) => (
         </p>
       </div>
       <div className="flex flex-wrap gap-2 mb-4">
-        {trip.highlights.map((tag) => (
+        {(trip.highlights || []).map((tag) => (
           <span
             key={tag}
             className="bg-gray-100 dark:bg-gray-700 text-xs font-medium px-2 py-1 rounded-full"
@@ -171,17 +119,17 @@ const TripCard = ({ trip }) => (
       </div>
       <div className="flex justify-between items-center font-semibold text-gray-700 dark:text-gray-200 mb-4">
         <div>
-          <p className="text-xs font-normal text-gray-500">Budget</p>
+          <p className="text-xs font-normal text-gray-500">Budget</p>$
           {trip.budget}
         </div>
         <div className="text-right">
-          <p className="text-xs font-normal text-gray-500">Spent</p>
+          <p className="text-xs font-normal text-gray-500">Spent</p>$
           {trip.spent}
         </div>
       </div>
       <div className="flex gap-2">
         <Link
-          to={`/my-trips/${trip.id}`}
+          to={`/my-trips/${trip._id}`}
           className="w-full bg-cyan-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-cyan-700 transition text-sm"
         >
           View Details
@@ -199,17 +147,76 @@ const MyTrips = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [tripsData, setTripsData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useContext(AuthContext);
+
+  // Fetch trips from API
+  useEffect(() => {
+    const fetchTrips = async () => {
+      if (!user?.id) return;
+
+      try {
+        setIsLoading(true);
+        const trips = await getUserTrips(user.id);
+        setTripsData(trips);
+      } catch (error) {
+        console.error("Error fetching trips:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTrips();
+  }, [user]);
+
+  // Calculate summary data from real trips
+  const calculateSummaryData = () => {
+    if (tripsData.length === 0) return summaryData;
+
+    const totalTrips = tripsData.length;
+    const totalBudget = tripsData.reduce(
+      (sum, trip) => sum + (trip.budget || 0),
+      0
+    );
+    const uniqueCountries = [...new Set(tripsData.map((trip) => trip.country))]
+      .length;
+    const avgProgress =
+      tripsData.reduce((sum, trip) => sum + (trip.progress || 0), 0) /
+      totalTrips;
+
+    return [
+      {
+        ...summaryData[0],
+        value: totalTrips.toString(),
+      },
+      {
+        ...summaryData[1],
+        value: `$${totalBudget.toLocaleString()}`,
+      },
+      {
+        ...summaryData[2],
+        value: uniqueCountries.toString(),
+      },
+      {
+        ...summaryData[3],
+        value: `${Math.round(avgProgress)}%`,
+      },
+    ];
+  };
 
   const filteredTrips = tripsData.filter((trip) => {
     const matchesSearch =
-      trip.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trip.highlights.some((h) =>
+      trip.destination?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (trip.highlights || []).some((h) =>
         h.toLowerCase().includes(searchTerm.toLowerCase())
       );
     const matchesFilter =
-      filter === "all" || trip.status.toLowerCase() === filter;
+      filter === "all" || trip.status?.toLowerCase() === filter;
     return matchesSearch && matchesFilter;
   });
+
+  const currentSummaryData = calculateSummaryData();
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
@@ -223,7 +230,7 @@ const MyTrips = () => {
               </p>
             </div>
             <button
-              onClick={() => setShowCreateModal(true)} // Open modal
+              onClick={() => setShowCreateModal(true)}
               className="mt-4 md:mt-0 flex items-center gap-2 bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-cyan-700 transition"
             >
               <Plus size={20} />
@@ -260,7 +267,7 @@ const MyTrips = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            {summaryData.map((item) => (
+            {currentSummaryData.map((item) => (
               <div
                 key={item.title}
                 className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md flex items-center gap-4"
@@ -278,18 +285,46 @@ const MyTrips = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredTrips.map((trip) => (
-              <TripCard key={trip.id} trip={trip} />
-            ))}
-          </div>
-          {filteredTrips.length === 0 && (
-            <div className="text-center py-20 col-span-full">
-              <h3 className="text-2xl font-semibold">
-                No Matching Trips Found
-              </h3>
-              <p className="text-gray-500">Try a different search or filter.</p>
+          {isLoading ? (
+            <div className="text-center py-20">
+              <h3 className="text-2xl font-semibold">Loading trips...</h3>
+              <p className="text-gray-500">
+                Please wait while we fetch your trips.
+              </p>
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredTrips.map((trip) => (
+                  <TripCard key={trip._id} trip={trip} />
+                ))}
+              </div>
+              {filteredTrips.length === 0 && tripsData.length > 0 && (
+                <div className="text-center py-20 col-span-full">
+                  <h3 className="text-2xl font-semibold">
+                    No Matching Trips Found
+                  </h3>
+                  <p className="text-gray-500">
+                    Try a different search or filter.
+                  </p>
+                </div>
+              )}
+              {tripsData.length === 0 && !isLoading && (
+                <div className="text-center py-20 col-span-full">
+                  <h3 className="text-2xl font-semibold">No Trips Yet</h3>
+                  <p className="text-gray-500">
+                    Create your first trip to get started!
+                  </p>
+                  <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="mt-4 flex items-center gap-2 bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-cyan-700 transition mx-auto"
+                  >
+                    <Plus size={20} />
+                    Create First Trip
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
@@ -297,6 +332,10 @@ const MyTrips = () => {
       <CreateTripModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
+        userId={user?.id}
+        onTripCreated={(newTrip) => {
+          setTripsData([...tripsData, newTrip]);
+        }}
       />
     </div>
   );

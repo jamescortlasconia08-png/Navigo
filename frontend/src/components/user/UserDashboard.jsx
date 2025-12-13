@@ -367,21 +367,16 @@ const TravelPlansModal = ({ isOpen, onClose, userSelection }) => {
   );
 };
 
-// Main Component
-const UserDashboard = () => {
-  const [view, setView] = useState("landing");
-  const [showPlansModal, setShowPlansModal] = useState(false);
-
-  // Simple form state with dropdowns
+// Planning Section Component
+const PlanningSection = () => {
   const [destination, setDestination] = useState("Select a destination");
   const [duration, setDuration] = useState("Select duration");
   const [travelStyle, setTravelStyle] = useState("Select travel style");
+  const [showPlansModal, setShowPlansModal] = useState(false);
 
-  // Simple form handler
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Check if all fields are selected
     if (
       destination !== "Select a destination" &&
       duration !== "Select duration" &&
@@ -393,140 +388,106 @@ const UserDashboard = () => {
     }
   };
 
-  const LandingPageContent = () => (
-    <div>
-      <section className="text-center py-20 px-6 bg-gray-50 dark:bg-gray-900">
-        <h1 className="text-5xl md:text-6xl font-extrabold mb-4">
-          Discover Your Next
-          <br />
-          <span className="text-cyan-500">Epic</span>{" "}
-          <span className="text-orange-400">Adventure</span>
-        </h1>
-        <p className="max-w-3xl mx-auto text-lg text-gray-600 dark:text-gray-300 mb-8">
-          Unlock intelligent travel planning with AI-powered recommendations,
-          seamless collaboration, and cost optimization. Turn your wanderlust
-          into unforgettable journeys.
-        </p>
-        <div className="flex justify-center gap-4 mb-10 flex-wrap">
-          <button
-            onClick={() => {
-              if (
-                destination !== "Select a destination" &&
-                duration !== "Select duration" &&
-                travelStyle !== "Select travel style"
-              ) {
-                setShowPlansModal(true);
-              } else {
-                alert("Please select all options first!");
-              }
-            }}
-            className="bg-cyan-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-cyan-700 transition flex items-center gap-2"
-          >
-            <Plane size={18} />
-            Start Your Journey <ArrowRight size={18} />
-          </button>
-          <button className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-2">
-            <MapPin size={18} />
-            Explore Features
-          </button>
-        </div>
-        <div className="flex justify-center gap-8 text-gray-600 dark:text-gray-300 flex-wrap">
-          <div className="flex items-center gap-2">
-            <Star size={18} className="text-yellow-400" />
-            <span>4.9/5 Rating</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Users size={18} className="text-green-400" />
-            <span>50K+ Travelers</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Globe size={18} className="text-blue-400" />
-            <span>190+ Countries</span>
-          </div>
-        </div>
-      </section>
+  return (
+    <>
+      <TravelPlansModal
+        isOpen={showPlansModal}
+        onClose={() => setShowPlansModal(false)}
+        userSelection={{ destination, duration, travelStyle }}
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8 max-w-7xl mx-auto">
-        <section className="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg">
-          <h2 className="text-2xl font-bold mb-2 flex items-center">
-            <Star size={22} className="text-yellow-400 mr-2" />
-            Plan Your Dream Journey
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
-            Select your preferences, and we'll craft the perfect adventure
+      <div className="mb-12">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            Plan Your Next
+            <span className="text-slate-600 dark:text-slate-300">
+              {" "}
+              Adventure
+            </span>
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            Select your preferences, and we'll craft the perfect journey
             tailored for you!
           </p>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Destination Dropdown */}
-            <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-2">
-                <MapPin size={18} className="inline mr-2" />
-                Destination
-              </label>
-              <select
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
-              >
-                {destinationOptions.map((option, index) => (
-                  <option key={index} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
+        </div>
 
-            {/* Duration Dropdown */}
-            <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-2">
-                <Briefcase size={18} className="inline mr-2" />
-                Trip Duration
-              </label>
-              <select
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
-              >
-                {durationOptions.map((option, index) => (
-                  <option key={index} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg">
+            <h2 className="text-2xl font-bold mb-6 flex items-center">
+              <Star size={22} className="text-yellow-500 mr-2" />
+              Create Your Dream Journey
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-2 flex items-center">
+                  <MapPin size={18} className="mr-2" />
+                  Destination
+                </label>
+                <select
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                >
+                  {destinationOptions.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Travel Style Dropdown */}
-            <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-2">
-                <Users size={18} className="inline mr-2" />
-                Travel Style
-              </label>
-              <select
-                value={travelStyle}
-                onChange={(e) => setTravelStyle(e.target.value)}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
-              >
-                {travelStyleOptions.map((option, index) => (
-                  <option key={index} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-2 flex items-center">
+                  <Briefcase size={18} className="mr-2" />
+                  Trip Duration
+                </label>
+                <select
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                >
+                  {durationOptions.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <button
-              type="submit"
-              className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2"
-            >
-              <Star size={20} />
-              Begin My Adventure
-            </button>
-          </form>
-        </section>
-        <aside>
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-2 flex items-center">
+                  <Users size={18} className="mr-2" />
+                  Travel Style
+                </label>
+                <select
+                  value={travelStyle}
+                  onChange={(e) => setTravelStyle(e.target.value)}
+                  className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                >
+                  {travelStyleOptions.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-slate-700 dark:bg-slate-600 text-white font-bold py-3 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-500 transition flex items-center justify-center gap-2"
+              >
+                <Star size={20} />
+                Generate Travel Plans
+              </button>
+            </form>
+          </div>
+
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg">
             <h3 className="text-xl font-bold mb-4 flex items-center">
-              <MapPin size={20} className="text-cyan-500 mr-2" />
+              <MapPin
+                size={20}
+                className="text-slate-600 dark:text-slate-400 mr-2"
+              />
               Recent Adventures
             </h3>
             <div className="space-y-4">
@@ -535,11 +496,13 @@ const UserDashboard = () => {
                   key={index}
                   className={`border-l-4 ${adv.borderColor} pl-4`}
                 >
-                  <h4 className="font-bold">{adv.title}</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  <h4 className="font-bold text-slate-800 dark:text-slate-200">
+                    {adv.title}
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
                     {adv.description}
                   </p>
-                  <div className="flex justify-between text-xs font-semibold text-gray-600 dark:text-gray-300">
+                  <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
                     <span>{adv.price}</span>
                     <span>{adv.duration}</span>
                     <span>{adv.distance}</span>
@@ -548,215 +511,208 @@ const UserDashboard = () => {
               ))}
             </div>
           </div>
-        </aside>
+        </div>
       </div>
-    </div>
+    </>
   );
+};
 
-  const DashboardContent = () => (
-    <div className="p-8 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">Travel Dashboard</h1>
-      <p className="text-gray-500 dark:text-gray-400 mb-8">
-        Manage your trips, bookings, and travel preferences in one place.
-      </p>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {statsCards.map((card, index) => (
-          <div
-            key={index}
-            className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md flex items-center gap-5"
-          >
-            <div className={`text-3xl ${card.color}`}>
-              {React.createElement(card.icon, { size: 32 })}
-            </div>
-            <div>
-              <div className="text-2xl font-bold">{card.number}</div>
-              <div className="text-gray-500 dark:text-gray-400">
-                {card.label}
-              </div>
-              <div className="text-xs text-green-500 font-semibold">
-                {card.change}
-              </div>
-            </div>
+// Stats Cards Component
+const StatsCards = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    {statsCards.map((card, index) => (
+      <div
+        key={index}
+        className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md flex items-center gap-5"
+      >
+        <div className={`text-3xl ${card.color}`}>
+          {React.createElement(card.icon, { size: 32 })}
+        </div>
+        <div>
+          <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            {card.number}
           </div>
-        ))}
-      </div>
-
-      <h2 className="text-2xl font-bold mb-6">Upcoming Trips</h2>
-      <div className="space-y-6">
-        {upcomingTrips.map((trip, index) => (
-          <div
-            key={index}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col md:flex-row overflow-hidden"
-          >
-            <div
-              className={`w-full md:w-1/3 h-48 md:h-auto bg-cover bg-center ${trip.imageClass}`}
-            ></div>
-            <div className="flex-1 p-6">
-              <h3 className="text-xl font-bold">{trip.destination}</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
-                {trip.dates}
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mb-4">
-                <div className="flex items-center gap-2">
-                  <Users size={16} />
-                  <span>{trip.travelers}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <DollarSign size={16} />
-                  <span>Budget: {trip.budget}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CreditCard size={16} />
-                  <span>Spent: {trip.spent}</span>
-                </div>
-              </div>
-              <div className="mb-2 text-sm">
-                Trip Planning Progress {trip.progress}%
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
-                <div
-                  className="bg-cyan-600 h-2.5 rounded-full"
-                  style={{ width: `${trip.progress}%` }}
-                ></div>
-              </div>
-              <div className="flex gap-4 flex-wrap">
-                <button className="bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-cyan-700 transition">
-                  View Journey
-                </button>
-                <button className="bg-gray-200 dark:bg-gray-700 font-semibold py-2 px-4 rounded-lg flex items-center gap-2">
-                  <Share2 size={16} />
-                  Share Trip
-                </button>
-              </div>
-            </div>
-            <div
-              className={`p-4 flex items-center justify-center font-bold ${
-                trip.status === "Confirmed"
-                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                  : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-              }`}
-            >
-              {trip.status}
-            </div>
+          <div className="text-slate-600 dark:text-slate-400">{card.label}</div>
+          <div className="text-xs text-green-500 font-semibold">
+            {card.change}
           </div>
-        ))}
+        </div>
       </div>
-    </div>
-  );
+    ))}
+  </div>
+);
 
-  const Footer = () => (
-    <footer className="bg-gray-800 text-gray-300 mt-12">
-      <div className="max-w-7xl mx-auto px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 className="text-lg font-bold mb-4">NaviGo</h3>
-            <p className="text-sm">
-              Your trusted partner for unforgettable travel experiences around
-              the world.
+// Upcoming Trips Component
+const UpcomingTrips = () => (
+  <div className="mb-12">
+    <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-slate-100">
+      Upcoming Trips
+    </h2>
+    <div className="space-y-6">
+      {upcomingTrips.map((trip, index) => (
+        <div
+          key={index}
+          className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg flex flex-col md:flex-row overflow-hidden"
+        >
+          <div
+            className={`w-full md:w-1/3 h-48 md:h-auto bg-cover bg-center ${trip.imageClass}`}
+          ></div>
+          <div className="flex-1 p-6">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+              {trip.destination}
+            </h3>
+            <p className="text-slate-600 dark:text-slate-400 mb-4">
+              {trip.dates}
             </p>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a href="#" className="hover:text-white">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Contact
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Support
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  FAQ
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4">Legal</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a href="#" className="hover:text-white">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Terms of Service
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Cookie Policy
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4">Connect</h4>
-            <div className="flex space-x-4">
-              <a href="#" className="hover:text-white">
-                <Facebook size={20} />
-              </a>
-              <a href="#" className="hover:text-white">
-                <Twitter size={20} />
-              </a>
-              <a href="#" className="hover:text-white">
-                <Instagram size={20} />
-              </a>
-              <a href="#" className="hover:text-white">
-                <Linkedin size={20} />
-              </a>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mb-4">
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <Users size={16} />
+                <span>{trip.travelers}</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <DollarSign size={16} />
+                <span>Budget: {trip.budget}</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <CreditCard size={16} />
+                <span>Spent: {trip.spent}</span>
+              </div>
+            </div>
+            <div className="mb-2 text-sm text-slate-700 dark:text-slate-300">
+              Trip Planning Progress {trip.progress}%
+            </div>
+            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mb-4">
+              <div
+                className="bg-slate-600 dark:bg-slate-400 h-2.5 rounded-full"
+                style={{ width: `${trip.progress}%` }}
+              ></div>
+            </div>
+            <div className="flex gap-4 flex-wrap">
+              <button className="bg-slate-700 dark:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-500 transition">
+                View Journey
+              </button>
+              <button className="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition flex items-center gap-2">
+                <Share2 size={16} />
+                Share Trip
+              </button>
             </div>
           </div>
+          <div
+            className={`p-4 flex items-center justify-center font-bold ${
+              trip.status === "Confirmed"
+                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+            }`}
+          >
+            {trip.status}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// Footer Component
+const Footer = () => (
+  <footer className="bg-slate-800 text-slate-300 mt-12">
+    <div className="max-w-7xl mx-auto px-8 py-12">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h3 className="text-lg font-bold mb-4">NaviGo</h3>
+          <p className="text-sm">
+            Your trusted partner for unforgettable travel experiences around the
+            world.
+          </p>
+        </div>
+        <div>
+          <h4 className="font-bold mb-4">Quick Links</h4>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <a href="#" className="hover:text-white">
+                About Us
+              </a>
+            </li>
+            <li>
+              <a href="#" className="hover:text-white">
+                Contact
+              </a>
+            </li>
+            <li>
+              <a href="#" className="hover:text-white">
+                Support
+              </a>
+            </li>
+            <li>
+              <a href="#" className="hover:text-white">
+                FAQ
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-bold mb-4">Legal</h4>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <a href="#" className="hover:text-white">
+                Privacy Policy
+              </a>
+            </li>
+            <li>
+              <a href="#" className="hover:text-white">
+                Terms of Service
+              </a>
+            </li>
+            <li>
+              <a href="#" className="hover:text-white">
+                Cookie Policy
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-bold mb-4">Connect</h4>
+          <div className="flex space-x-4">
+            <a href="#" className="hover:text-white">
+              <Facebook size={20} />
+            </a>
+            <a href="#" className="hover:text-white">
+              <Twitter size={20} />
+            </a>
+            <a href="#" className="hover:text-white">
+              <Instagram size={20} />
+            </a>
+            <a href="#" className="hover:text-white">
+              <Linkedin size={20} />
+            </a>
+          </div>
         </div>
       </div>
-      <div className="text-center py-4 border-t border-gray-700 text-sm">
-        © 2025 NaviGo Adventure Travels. All rights reserved.
-      </div>
-    </footer>
-  );
+    </div>
+    <div className="text-center py-4 border-t border-slate-700 text-sm">
+      © 2025 NaviGo Adventure Travels. All rights reserved.
+    </div>
+  </footer>
+);
 
+// Main Dashboard Component
+const UserDashboard = () => {
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
-      <TravelPlansModal
-        isOpen={showPlansModal}
-        onClose={() => setShowPlansModal(false)}
-        userSelection={{ destination, duration, travelStyle }}
-      />
+    <div className="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen font-sans">
+      <div className="p-8 max-w-7xl mx-auto">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+            Travel Dashboard
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400">
+            Manage your trips, bookings, and travel preferences in one place.
+          </p>
+        </header>
 
-      <div className="flex justify-center py-6">
-        <div className="bg-gray-200 dark:bg-gray-700 p-1 rounded-lg flex">
-          <button
-            onClick={() => setView("landing")}
-            className={`px-6 py-2 rounded-md font-semibold ${
-              view === "landing" ? "bg-white dark:bg-gray-800 shadow" : ""
-            }`}
-          >
-            Landing Page
-          </button>
-          <button
-            onClick={() => setView("dashboard")}
-            className={`px-6 py-2 rounded-md font-semibold ${
-              view === "dashboard" ? "bg-white dark:bg-gray-800 shadow" : ""
-            }`}
-          >
-            Dashboard
-          </button>
-        </div>
+        <StatsCards />
+        <PlanningSection />
+        <UpcomingTrips />
       </div>
-      <main>
-        {view === "landing" ? <LandingPageContent /> : <DashboardContent />}
-      </main>
+
       <Footer />
     </div>
   );

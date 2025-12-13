@@ -14,10 +14,13 @@ import {
 } from "lucide-react";
 import logo from "../../assets/NaviGo_Logo.png";
 import { AuthContext } from "../../context/AuthContext";
+import { login, register } from "../../services/authentication/userAuthService";
 
 const UserLogin = () => {
   const [isRegister, setIsRegister] = useState(false);
   const { setUser } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // Form state for login
   const [loginData, setLoginData] = useState({
@@ -34,51 +37,59 @@ const UserLogin = () => {
     confirmPassword: "",
   });
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     // Basic validation
     if (!loginData.email || !loginData.password) {
-      alert("Please fill in all fields");
+      setError("Please fill in all fields");
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(loginData.email)) {
-      alert("Please enter a valid email address");
+      setError("Please enter a valid email address");
       return;
     }
 
     // Password validation
     if (loginData.password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      setError("Password must be at least 6 characters long");
       return;
     }
 
-    // Simulate API call - replace with actual authentication
-    console.log("Login attempt with:", loginData);
+    try {
+      setIsLoading(true);
 
-    // For demo purposes, set user as authenticated
-    setUser({
-      id: 1,
-      name:
-        `${registerData.firstName} ${registerData.lastName}`.trim() ||
-        "Travel Explorer",
-      email: loginData.email,
-    });
+      // Call the login service
+      const response = await login(loginData);
 
-    // Reset form
-    setLoginData({
-      email: "",
-      password: "",
-    });
+      // Set user in context
+      setUser(response.user);
 
-    alert("Login successful! Welcome back!");
+      // Reset form
+      setLoginData({
+        email: "",
+        password: "",
+      });
+
+      // Show success message
+      alert("Login successful! Welcome back!");
+    } catch (err) {
+      // Handle error from service
+      const errorMessage =
+        err.response?.data?.error || "Login failed. Please try again.";
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     // Basic validation
     if (
@@ -88,49 +99,61 @@ const UserLogin = () => {
       !registerData.password ||
       !registerData.confirmPassword
     ) {
-      alert("Please fill in all fields");
+      setError("Please fill in all fields");
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(registerData.email)) {
-      alert("Please enter a valid email address");
+      setError("Please enter a valid email address");
       return;
     }
 
     // Password validation
     if (registerData.password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      setError("Password must be at least 6 characters long");
       return;
     }
 
     // Password confirmation
     if (registerData.password !== registerData.confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
 
-    // Simulate API call - replace with actual registration
-    console.log("Registration attempt with:", registerData);
+    try {
+      setIsLoading(true);
 
-    // For demo purposes, set user as authenticated
-    setUser({
-      id: 1,
-      name: `${registerData.firstName} ${registerData.lastName}`,
-      email: registerData.email,
-    });
+      // Call register service
+      const response = await register({
+        first_name: registerData.firstName,
+        last_name: registerData.lastName,
+        email: registerData.email,
+        password: registerData.password,
+        confirm_password: registerData.confirmPassword,
+      });
 
-    // Reset form
-    setRegisterData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    });
+      // Set user in context from response
+      setUser(response.user);
 
-    alert("Registration successful! Welcome to NaviGo!");
+      // Reset form
+      setRegisterData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+
+      alert(response.message || "Registration successful! Welcome to NaviGo!");
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.error || "Registration failed. Please try again.";
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Update login form data
@@ -140,6 +163,7 @@ const UserLogin = () => {
       ...prev,
       [id]: value,
     }));
+    setError(""); // Clear error when user types
   };
 
   // Update register form data
@@ -149,6 +173,7 @@ const UserLogin = () => {
       ...prev,
       [id]: value,
     }));
+    setError(""); // Clear error when user types
   };
 
   return (
@@ -246,6 +271,13 @@ const UserLogin = () => {
               </div>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Sign In Form */}
             <form
               onSubmit={handleLoginSubmit}
@@ -270,6 +302,7 @@ const UserLogin = () => {
                   onChange={handleLoginChange}
                   placeholder="traveler@example.com"
                   className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  disabled={isLoading}
                 />
               </div>
               <div className="mb-6">
@@ -287,13 +320,21 @@ const UserLogin = () => {
                   onChange={handleLoginChange}
                   placeholder="Your secure password"
                   className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  disabled={isLoading}
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-cyan-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-cyan-700 transition flex items-center justify-center"
+                className="w-full bg-cyan-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-cyan-700 transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isLoading}
               >
-                <Plane size={16} className="mr-2" /> Begin Journey
+                {isLoading ? (
+                  "Signing in..."
+                ) : (
+                  <>
+                    <Plane size={16} className="mr-2" /> Begin Journey
+                  </>
+                )}
               </button>
             </form>
 
@@ -321,6 +362,7 @@ const UserLogin = () => {
                     onChange={handleRegisterChange}
                     placeholder="Explorer"
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    disabled={isLoading}
                   />
                 </div>
                 <div>
@@ -337,6 +379,7 @@ const UserLogin = () => {
                     onChange={handleRegisterChange}
                     placeholder="Adventurer"
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="col-span-2">
@@ -354,6 +397,7 @@ const UserLogin = () => {
                     onChange={handleRegisterChange}
                     placeholder="explorer@wanderlust.com"
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="col-span-2">
@@ -371,6 +415,7 @@ const UserLogin = () => {
                     onChange={handleRegisterChange}
                     placeholder="Create your travel key"
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="col-span-2">
@@ -388,12 +433,14 @@ const UserLogin = () => {
                     onChange={handleRegisterChange}
                     placeholder="Repeat your travel key"
                     className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
               <button
                 type="submit"
-                className="w-full mt-6 bg-cyan-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-cyan-700 transition flex items-center justify-center"
+                className="w-full mt-6 bg-cyan-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-cyan-700 transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isLoading}
               >
                 <Compass size={16} className="mr-2" /> Start Adventure
               </button>

@@ -8,9 +8,19 @@ export const register = async (req, res) => {
     const { first_name, last_name, email, password, confirm_password } =
       req.body;
 
+    // Validate required fields
+    if (!first_name || !last_name || !email || !password || !confirm_password) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
     // Check if passwords match
     if (password !== confirm_password) {
       return res.status(400).json({ error: "Passwords do not match" });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters" });
     }
 
     // Check if user exists
@@ -40,8 +50,14 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Register error:", error.message);
-    console.error("Full error:", error);
+    console.error("Register error message:", error.message);
+    console.error("Register error stack:", error.stack);
+    
+    // Handle specific MongoDB errors
+    if (error.code === 11000) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
+    
     res.status(500).json({ error: error.message || "Server error" });
   }
 };
@@ -74,7 +90,8 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Login error message:", error.message);
+    console.error("Login error stack:", error.stack);
+    res.status(500).json({ error: error.message || "Server error" });
   }
 };

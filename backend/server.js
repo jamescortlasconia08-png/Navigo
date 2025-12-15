@@ -38,6 +38,15 @@ app.use("/api/booking-request", bookingRequestRouter);
 //Authnetication
 app.use("/api/user/auth", userAuthRouter);
 
+// Root and health check routes
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Navigo backend is running" });
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).send("ok");
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);

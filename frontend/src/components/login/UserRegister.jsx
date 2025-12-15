@@ -1,9 +1,12 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { register } from "../../services/authentication/userAuthService";
+import { AuthContext } from "../../context/AuthContext";
 
 const UserRegister = () => {
+  const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -73,6 +76,9 @@ const UserRegister = () => {
       // Show success message
       alert(response.message || "Registration successful!");
 
+      // Set user in context to trigger redirect
+      setUser(response.user);
+
       // Reset form
       setFormData({
         firstName: "",
@@ -82,8 +88,8 @@ const UserRegister = () => {
         confirmPassword: "",
       });
 
-      // Optionally redirect to login
-      // navigate('/login/user');
+      // Redirect to user dashboard
+      navigate("/dashboard");
     } catch (err) {
       const errorMessage =
         err.response?.data?.error || "Registration failed. Please try again.";

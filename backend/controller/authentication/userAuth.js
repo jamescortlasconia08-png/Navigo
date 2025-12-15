@@ -40,8 +40,9 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Register error:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Register error:", error.message);
+    console.error("Full error:", error);
+    res.status(500).json({ error: error.message || "Server error" });
   }
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   MoveRight,
   Compass,
@@ -21,12 +21,19 @@ import {
   Twitter,
   Instagram,
   Linkedin,
+  Sun,
+  Moon,
 } from "lucide-react";
 import logo from "../assets/NaviGo_Logo.png";
 import { Link } from "react-router-dom";
+import { ThemeContext } from "../context/ThemeContext";
+import AuthRoleSelector from "../components/auth/AuthRoleSelector";
 
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("login"); // "login" or "register"
+  const { theme, toggleTheme } = useContext(ThemeContext);
 
   const startJourney = () => {
     document
@@ -121,7 +128,7 @@ const LandingPage = () => {
               <div className="w-8 h-8  rounded-lg">
                 <img src={logo} alt="" className="w-full h-full " />
               </div>
-              <span className="text-xl font-bold text-slate-200">NaviGo</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">NaviGo</span>
             </a>
 
             {/* Desktop Menu */}
@@ -153,18 +160,35 @@ const LandingPage = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-4">
-              <Link
-                to="/login/user"
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? (
+                  <Sun size={20} className="text-gray-700 dark:text-gray-300" />
+                ) : (
+                  <Moon size={20} className="text-gray-700 dark:text-gray-300" />
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  setAuthMode("login");
+                  setAuthModalOpen(true);
+                }}
                 className="px-4 py-2 font-medium hover:text-cyan-600 transition-colors"
               >
                 Login
-              </Link>
-              <Link
-                to="/login/business"
+              </button>
+              <button
+                onClick={() => {
+                  setAuthMode("register");
+                  setAuthModalOpen(true);
+                }}
                 className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-2 rounded-full font-semibold transition-colors"
               >
                 Get Started
-              </Link>
+              </button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -212,20 +236,40 @@ const LandingPage = () => {
                 Contact
               </a>
               <div className="pt-4 space-y-2">
-                <Link
-                  to="/login/user"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block w-full px-4 py-2 font-medium text-center hover:text-cyan-600 transition-colors border border-gray-300 rounded-lg"
+                <button
+                  onClick={toggleTheme}
+                  className="flex items-center justify-center w-full px-4 py-2 font-medium text-center hover:text-cyan-600 transition-colors border border-gray-300 dark:border-gray-600 rounded-lg gap-2"
+                >
+                  {theme === "dark" ? (
+                    <>
+                      <Sun size={18} /> Light Mode
+                    </>
+                  ) : (
+                    <>
+                      <Moon size={18} /> Dark Mode
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setAuthMode("login");
+                    setAuthModalOpen(true);
+                  }}
+                  className="block w-full px-4 py-2 font-medium text-center hover:text-cyan-600 transition-colors border border-gray-300 dark:border-gray-600 rounded-lg"
                 >
                   Login
-                </Link>
-                <Link
-                  to="/login/business"
-                  onClick={() => setIsMenuOpen(false)}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setAuthMode("register");
+                    setAuthModalOpen(true);
+                  }}
                   className="block w-full bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-center"
                 >
                   Get Started
-                </Link>
+                </button>
               </div>
             </div>
           )}
@@ -465,12 +509,15 @@ const LandingPage = () => {
             Join thousands of travelers who have transformed their travel
             experiences with NaviGo.
           </p>
-          <Link
-            to="/login/business"
+          <button
+            onClick={() => {
+              setAuthMode("register");
+              setAuthModalOpen(true);
+            }}
             className="inline-block bg-white text-cyan-600 hover:bg-gray-100 font-bold py-4 px-12 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl"
           >
             Get Started Free
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -567,6 +614,13 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
+
+      {/* Auth Role Selector Modal */}
+      <AuthRoleSelector
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        mode={authMode}
+      />
     </div>
   );
 };

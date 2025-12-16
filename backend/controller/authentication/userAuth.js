@@ -38,6 +38,7 @@ export const register = async (req, res) => {
       last_name,
       email,
       password: hashedPassword,
+      role: "traveler",
     });
 
     res.status(201).json({
@@ -47,6 +48,7 @@ export const register = async (req, res) => {
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
+        role: user.role || "traveler",
       },
     });
   } catch (error) {
@@ -86,7 +88,7 @@ export const login = async (req, res) => {
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
-        role: user.role,
+        role: user.role || "traveler",
       },
     });
   } catch (error) {

@@ -5,11 +5,15 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
+  // Ensure user objects always include a role for route selection
+  const normalizeUser = (payload) =>
+    payload ? { ...payload, role: payload.role || "traveler" } : null;
+
   // Load user from session storage on component mount
   useEffect(() => {
     const storedUser = sessionStorage.getItem("navigo_user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(normalizeUser(JSON.parse(storedUser)));
     }
   }, []);
 
@@ -27,9 +31,12 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem("navigo_user");
   };
 
+  // Expose a setter that always normalizes the user object
+  const setUserNormalized = (payload) => setUser(normalizeUser(payload));
+
   const value = {
     user,
-    setUser,
+    setUser: setUserNormalized,
     logout,
     isAuthenticated: !!user,
   };

@@ -185,35 +185,47 @@ const LandingPage = () => {
             <div className="md:hidden mt-4 pb-4 space-y-4">
               <a
                 href="#features"
+                onClick={() => setIsMenuOpen(false)}
                 className="block font-medium hover:text-cyan-600 transition-colors"
               >
                 Features
               </a>
               <a
                 href="#testimonials"
+                onClick={() => setIsMenuOpen(false)}
                 className="block font-medium hover:text-cyan-600 transition-colors"
               >
                 Testimonials
               </a>
               <a
                 href="#pricing"
+                onClick={() => setIsMenuOpen(false)}
                 className="block font-medium hover:text-cyan-600 transition-colors"
               >
                 Pricing
               </a>
               <a
                 href="#contact"
+                onClick={() => setIsMenuOpen(false)}
                 className="block font-medium hover:text-cyan-600 transition-colors"
               >
                 Contact
               </a>
               <div className="pt-4 space-y-2">
-                <button className="w-full px-4 py-2 font-medium hover:text-cyan-600 transition-colors border border-gray-300 rounded-lg">
-                  <Link to="/login/user">Login</Link>
-                </button>
-                <button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
-                  <Link to="/login/business">Get Started</Link>
-                </button>
+                <Link
+                  to="/login/user"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block w-full px-4 py-2 font-medium text-center hover:text-cyan-600 transition-colors border border-gray-300 rounded-lg"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/login/business"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block w-full bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-center"
+                >
+                  Get Started
+                </Link>
               </div>
             </div>
           )}
@@ -453,9 +465,12 @@ const LandingPage = () => {
             Join thousands of travelers who have transformed their travel
             experiences with NaviGo.
           </p>
-          <button className="bg-white text-cyan-600 hover:bg-gray-100 font-bold py-4 px-12 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl">
+          <Link
+            to="/login/business"
+            className="inline-block bg-white text-cyan-600 hover:bg-gray-100 font-bold py-4 px-12 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl"
+          >
             Get Started Free
-          </button>
+          </Link>
         </div>
       </section>
 

@@ -93,11 +93,25 @@ const TripCard = ({ trip }) => {
         </div>
         <div className="absolute top-3 right-3 flex space-x-2">
           {trip.isFavorite && (
-            <button className="w-8 h-8 rounded-full flex items-center justify-center bg-yellow-400/80 backdrop-blur-sm text-white">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                alert("This trip is marked as favorite!");
+              }}
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-yellow-400/80 backdrop-blur-sm text-white hover:bg-yellow-500 transition min-w-[44px] min-h-[44px]"
+              aria-label="Favorite trip"
+            >
               <Star size={18} fill="currentColor" />
             </button>
           )}
-          <button className="w-8 h-8 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm text-gray-700">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              alert(`Viewing details for ${trip.destination}`);
+            }}
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white transition min-w-[44px] min-h-[44px]"
+            aria-label="View trip"
+          >
             <Eye size={18} />
           </button>
         </div>
@@ -169,10 +183,32 @@ const TripCard = ({ trip }) => {
           >
             View Details
           </Link>
-          <button className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: `Trip to ${trip.destination}`,
+                  text: `Check out my trip to ${trip.destination} - ${trip.dates}`,
+                }).catch((err) => console.log("Error sharing:", err));
+              } else {
+                navigator.clipboard.writeText(
+                  `Trip to ${trip.destination} - ${trip.dates}`
+                );
+                alert("Trip link copied to clipboard!");
+              }
+            }}
+            className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Share trip"
+          >
             <Share2 size={16} />
           </button>
-          <button className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+          <button
+            onClick={() => {
+              alert(`Downloading trip details for ${trip.destination}...`);
+            }}
+            className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Download trip"
+          >
             <Download size={16} />
           </button>
         </div>
@@ -195,7 +231,7 @@ const History = () => {
   );
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
+    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-200">
       {/* Main Content */}
       <main className="p-6 lg:p-10">
         <div className="max-w-7xl mx-auto">
@@ -223,15 +259,30 @@ const History = () => {
                 />
               </div>
               <div className="flex gap-2">
-                <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold text-sm">
+                <button
+                  onClick={() => {
+                    alert("Year filter coming soon!");
+                  }}
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition min-h-[44px]"
+                >
                   <ChevronDown size={16} />
                   <span>All Years</span>
                 </button>
-                <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold text-sm">
+                <button
+                  onClick={() => {
+                    alert("Type filter coming soon!");
+                  }}
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition min-h-[44px]"
+                >
                   <ChevronDown size={16} />
                   <span>All Types</span>
                 </button>
-                <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold text-sm">
+                <button
+                  onClick={() => {
+                    alert("More filters coming soon!");
+                  }}
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition min-h-[44px]"
+                >
                   <SlidersHorizontal size={16} />
                   <span>More</span>
                 </button>

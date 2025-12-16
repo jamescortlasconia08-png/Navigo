@@ -52,7 +52,7 @@ const UserLayout = ({ children }) => {
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       <SplashScreen onLoadingComplete={handleLoadingComplete} />
 
       <AnimatePresence mode="wait">
@@ -63,11 +63,14 @@ const UserLayout = ({ children }) => {
             initial="hidden"
             animate="visible"
             exit="exit"
+            className="min-h-screen"
           >
             <motion.div variants={childVariants}>
               <Header />
             </motion.div>
-            <div>{children}</div>
+            <div className="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+              {children}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

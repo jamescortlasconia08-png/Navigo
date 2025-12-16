@@ -3,3 +3,57 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* Ensure body and html have proper background for dark mode */
+html,
+body {
+  background-color: #f9fafb; /* gray-50 */
+  transition: background-color 0.2s ease;
+}
+
+html.dark,
+html.dark body {
+  background-color: #111827; /* gray-900 */
+}
+
+/* Ensure dark mode class is applied correctly */
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
+}
+
+/* Mobile app safe area support */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Ensure buttons are visible and have proper touch targets on mobile */
+button {
+  -webkit-tap-highlight-color: rgba(6, 182, 212, 0.3);
+  touch-action: manipulation;
+}
+
+/* Minimum touch target size for mobile */
+@media (max-width: 768px) {
+  button,
+  a[role="button"],
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Improve visibility for installed PWA */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

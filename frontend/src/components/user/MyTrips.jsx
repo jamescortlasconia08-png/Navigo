@@ -76,7 +76,14 @@ const TripCard = ({ trip }) => (
       >
         {trip.status}
       </div>
-      <button className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm text-gray-700">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          alert("Trip options menu");
+        }}
+        className="absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white transition min-w-[44px] min-h-[44px]"
+        aria-label="Trip options"
+      >
         <MoreVertical size={18} />
       </button>
     </div>
@@ -134,7 +141,23 @@ const TripCard = ({ trip }) => (
         >
           View Details
         </Link>
-        <button className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+        <button
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({
+                title: `Trip to ${trip.destination}`,
+                text: `Check out my trip to ${trip.destination}`,
+              }).catch((err) => console.log("Error sharing:", err));
+            } else {
+              navigator.clipboard.writeText(
+                `Trip to ${trip.destination} - NaviGo`
+              );
+              alert("Trip link copied to clipboard!");
+            }
+          }}
+          className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition min-w-[44px] min-h-[44px] flex items-center justify-center"
+          aria-label="Share trip"
+        >
           <Share2 size={16} />
         </button>
       </div>
@@ -219,7 +242,7 @@ const MyTrips = () => {
   const currentSummaryData = calculateSummaryData();
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
+    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-200">
       <main className="p-6 lg:p-10">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -260,7 +283,12 @@ const MyTrips = () => {
               <option value="planning">Planning</option>
               <option value="business">Business</option>
             </select>
-            <button className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold">
+            <button
+              onClick={() => {
+                alert("More filters coming soon!");
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition min-h-[44px]"
+            >
               <SlidersHorizontal size={16} />
               More Filters
             </button>

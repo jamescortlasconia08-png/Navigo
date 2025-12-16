@@ -10,13 +10,17 @@ export const getUserProfile = async (req, res) => {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-    const user = await User.findById(userId).select("-password_hash");
+    const user = await User.findById(userId).select("-password");
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.status(200).json(user);
+    // Convert _id to id for consistency with frontend
+    const userResponse = user.toObject();
+    userResponse.id = userResponse._id.toString();
+
+    res.status(200).json(userResponse);
   } catch (error) {
     console.error("Get user profile error:", error);
     res.status(500).json({ error: "Server error" });
@@ -30,22 +34,27 @@ export const updateUserProfile = async (req, res) => {
     const updateData = req.body;
 
     // Remove fields that shouldn't be updated directly
+    delete updateData.password;
     delete updateData.password_hash;
     delete updateData._id;
     delete updateData.createdAt;
-    delete updateData.subscription_status;
+    // Allow subscription_status and subscription_plan to be updated for subscription management
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updateData },
       { new: true, runValidators: true }
-    ).select("-password_hash");
+    ).select("-password");
 
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.status(200).json(updatedUser);
+    // Convert _id to id for consistency with frontend
+    const userResponse = updatedUser.toObject();
+    userResponse.id = userResponse._id.toString();
+
+    res.status(200).json(userResponse);
   } catch (error) {
     console.error("Update user profile error:", error);
 
@@ -97,7 +106,7 @@ export const searchUsers = async (req, res) => {
     }
 
     const users = await User.find(query)
-      .select("-password_hash")
+      .select("-password")
       .limit(50)
       .sort({ created_at: -1 });
 

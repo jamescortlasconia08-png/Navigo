@@ -326,10 +326,20 @@ const TravelPlansModal = ({ isOpen, onClose, userSelection }) => {
                       </div>
                     </div>
                     <div className="flex gap-3">
-                      <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                      <button
+                        onClick={() => {
+                          alert(`Saving "${plan.title}" for later...`);
+                        }}
+                        className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition min-h-[44px] flex items-center justify-center"
+                      >
                         Save for Later
                       </button>
-                      <button className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          alert(`Booking "${plan.title}" for ${plan.price}...`);
+                        }}
+                        className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition flex items-center gap-2 min-h-[44px]"
+                      >
                         <Calendar size={16} />
                         Book Now
                       </button>
@@ -355,7 +365,20 @@ const TravelPlansModal = ({ isOpen, onClose, userSelection }) => {
               >
                 Close
               </button>
-              <button className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition flex items-center gap-2">
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: "My Travel Plans",
+                      text: "Check out my personalized travel plans!",
+                    }).catch((err) => console.log("Error sharing:", err));
+                  } else {
+                    navigator.clipboard.writeText("My Travel Plans - NaviGo");
+                    alert("Travel plans link copied to clipboard!");
+                  }
+                }}
+                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition flex items-center gap-2 min-h-[44px]"
+              >
                 <Share2 size={16} />
                 Share Plans
               </button>
@@ -588,10 +611,33 @@ const UpcomingTrips = () => (
               ></div>
             </div>
             <div className="flex gap-4 flex-wrap">
-              <button className="bg-slate-700 dark:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-500 transition">
+              <button
+                onClick={() => {
+                  // Navigate to trip details or show trip information
+                  alert(`Viewing journey details for ${trip.destination}`);
+                }}
+                className="bg-slate-700 dark:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-500 transition min-h-[44px] min-w-[120px] flex items-center justify-center"
+              >
                 View Journey
               </button>
-              <button className="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition flex items-center gap-2">
+              <button
+                onClick={() => {
+                  // Share trip functionality
+                  if (navigator.share) {
+                    navigator.share({
+                      title: `Trip to ${trip.destination}`,
+                      text: `Check out my trip to ${trip.destination} on ${trip.dates}`,
+                    }).catch((err) => console.log("Error sharing:", err));
+                  } else {
+                    // Fallback: copy to clipboard
+                    navigator.clipboard.writeText(
+                      `Trip to ${trip.destination} - ${trip.dates}`
+                    );
+                    alert("Trip link copied to clipboard!");
+                  }
+                }}
+                className="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition flex items-center gap-2 min-h-[44px]"
+              >
                 <Share2 size={16} />
                 Share Trip
               </button>
@@ -697,7 +743,7 @@ const Footer = () => (
 // Main Dashboard Component
 const UserDashboard = () => {
   return (
-    <div className="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen font-sans">
+    <div className="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
       <div className="p-8 max-w-7xl mx-auto">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">

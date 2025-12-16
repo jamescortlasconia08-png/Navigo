@@ -14,9 +14,11 @@ import {
 import { AuthContext } from "../../context/AuthContext";
 import BusinessSchedulesModal from "./BusinessSchedulesModal";
 import { getAllBusinesses } from "../../services/businessService";
+import { useNavigate } from "react-router-dom";
 
 const Plan = () => {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [businesses, setBusinesses] = useState([]);
@@ -168,7 +170,7 @@ const Plan = () => {
   }
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
+    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-200">
       <main className="p-6 lg:p-10">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -184,7 +186,10 @@ const Plan = () => {
                 </div>
               )}
             </div>
-            <button className="mt-4 md:mt-0 flex items-center gap-2 text-sm font-semibold text-cyan-600 hover:text-cyan-700 transition">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="mt-4 md:mt-0 flex items-center gap-2 text-sm font-semibold text-cyan-600 hover:text-cyan-700 transition min-h-[44px] px-4"
+            >
               <ArrowLeft size={16} />
               Back to Dashboard
             </button>
@@ -218,7 +223,12 @@ const Plan = () => {
                   <option value="rental">Car Rentals</option>
                   <option value="travel agency">Travel Agencies</option>
                 </select>
-                <button className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold">
+                <button
+                  onClick={() => {
+                    alert("More filters coming soon!");
+                  }}
+                  className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition min-h-[44px]"
+                >
                   <Filter size={16} />
                   More Filters
                 </button>

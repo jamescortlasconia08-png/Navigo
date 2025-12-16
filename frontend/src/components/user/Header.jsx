@@ -23,6 +23,8 @@ import {
 
 import logo from "../../assets/NaviGo_Logo.png";
 import { AuthContext } from "../../context/AuthContext";
+import { ThemeContext } from "../../context/ThemeContext";
+import { Sun } from "lucide-react";
 
 const Header = () => {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -81,6 +83,8 @@ const Header = () => {
   ]);
 
   const { logout, user } = useContext(AuthContext);
+  const themeContext = useContext(ThemeContext);
+  const { theme = "light", toggleTheme } = themeContext || {};
   const location = useLocation();
 
   const profileRef = useRef(null);
@@ -142,7 +146,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 flex items-center justify-between px-6 py-3">
+    <header className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 flex items-center justify-between px-6 py-3 transition-colors duration-200">
       <div className="flex items-center space-x-6">
         <Link to="/" className="flex items-center space-x-2">
           <img src={logo} alt="NaviGo Logo" className="h-10" />
@@ -196,8 +200,22 @@ const Header = () => {
         </nav>
       </div>
       <div className="flex items-center space-x-4">
-        <button className="text-gray-500 hover:text-cyan-600">
-          <Moon size={22} />
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("Theme toggle clicked, current theme:", theme);
+            toggleTheme();
+          }}
+          className="text-gray-500 hover:text-cyan-600 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+          aria-label="Toggle theme"
+          type="button"
+        >
+          {theme === "dark" ? (
+            <Sun size={22} className="text-yellow-500" />
+          ) : (
+            <Moon size={22} />
+          )}
         </button>
 
         {/* Notifications Dropdown */}

@@ -33,7 +33,8 @@ const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login"); // "login" or "register"
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+  const { theme = "light", toggleTheme } = themeContext || {};
 
   const startJourney = () => {
     document
@@ -161,12 +162,17 @@ const LandingPage = () => {
 
             <div className="hidden md:flex items-center space-x-4">
               <button
-                onClick={toggleTheme}
-                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleTheme();
+                }}
+                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                 aria-label="Toggle theme"
+                type="button"
               >
                 {theme === "dark" ? (
-                  <Sun size={20} className="text-gray-700 dark:text-gray-300" />
+                  <Sun size={20} className="text-yellow-500" />
                 ) : (
                   <Moon size={20} className="text-gray-700 dark:text-gray-300" />
                 )}

@@ -286,7 +286,7 @@ const Explore = () => {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
+    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-200">
       {/* Main Content */}
       <main className="p-6 lg:p-10">
         <div className="max-w-7xl mx-auto">
